@@ -1,0 +1,21 @@
+[Unit]
+Description=Guarded standalone EAP610 MCP (pinned HTTPS, local approval)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/tplink-env/bin/python %h/.local/share/eap610-mcp/server.py
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/eap610-mcp
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryMax=160M
+
+[Install]
+WantedBy=default.target

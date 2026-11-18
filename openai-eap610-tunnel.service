@@ -1,0 +1,20 @@
+[Unit]
+Description=Dedicated OpenAI authenticated tunnel for EAP610 MCP
+After=network-online.target eap610-mcp.service
+Wants=network-online.target
+Requires=eap610-mcp.service
+ConditionPathExists=%h/.config/eap610-mcp/tunnel-id.env
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/eap610-mcp/tunnel-environment
+EnvironmentFile=%h/.config/eap610-mcp/tunnel-id.env
+ExecStart=/usr/local/bin/tunnel-client run --control-plane.tunnel-id=${EAP610_TUNNEL_ID} --mcp.server-url=http://127.0.0.1:8770/mcp "--mcp.extra-headers=Authorization: file:%h/.config/eap610-mcp/mcp-authorization" "--mcp.discovery-extra-headers=Authorization: file:%h/.config/eap610-mcp/mcp-authorization" --mcp.startup-wait-timeout=15s --health.listen-addr=127.0.0.1:0 --health.url-file=%h/.config/eap610-mcp/tunnel-health-url
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
